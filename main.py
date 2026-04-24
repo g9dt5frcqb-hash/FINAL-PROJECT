@@ -16,7 +16,7 @@ world = World()
 
 running = True
 while running:
-    dt = clock.tick(60) / 1000  # delta time for smooth movement
+    dt = clock.tick(60) / 1000 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -26,7 +26,7 @@ while running:
     player.update(dt, world)
 
     # Draw
-    screen.fill((135, 206, 235))  # sky blue background
+    screen.fill((135, 206, 235)) 
     world.draw(screen)
     player.draw(screen)
 
