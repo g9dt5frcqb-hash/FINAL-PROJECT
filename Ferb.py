@@ -18,93 +18,91 @@ def slice_row(sheet, row_index, frame_count, frame_height):
     return frames
 
 
-class Player:
+class Ferb:
     def __init__(self, x, y):
-        # --- Load sprite sheet ---
+        
         self.sheet = pygame.image.load(
-            os.path.join("engine", "assets", "sprites", "phineas.png")
+            os.path.join("engine", "assets", "sprites", "Ferb.png")
         ).convert_alpha()
 
-        # Remove dark blue background from sprite sheet
+        
         self.sheet.set_colorkey((0, 0, 139))
 
-        # Height of each row in the sprite sheet (adjust if yours differs)
+        
         self.frame_height = 60
 
-        # --- Slice animation rows ---
-        # Row 1 (index 0) = walk down placeholder, 12 frames
-        # Row 3 (index 2) = walk right, 12 frames
-        # walk_up = Row 1 flipped vertically
-        # walk_left = Row 3 flipped horizontally
-        self.walk_down  = slice_row(self.sheet, 0, 12, self.frame_height)
-        self.walk_up    = [pygame.transform.flip(f, False, True) for f in self.walk_down]
-        self.walk_right = slice_row(self.sheet, 2, 12, self.frame_height)
+        
+        self.walk_right = slice_row(self.sheet, 2, 9, self.frame_height)
         self.walk_left  = [
             pygame.transform.flip(f, True, False) for f in self.walk_right
         ]
+        self.walk_down  = slice_row(self.sheet, 0, 9, self.frame_height)
+        self.walk_up    = [
+            pygame.transform.flip(f, False, True) for f in self.walk_down
+        ]
 
-        # --- Animation state ---
+        
         self.current_animation = self.walk_down
-        self.frame_index       = 0.0          # float so dt-based stepping is smooth
-        self.animation_speed   = 10           # frames per second (tweak to taste)
+        self.frame_index       = 0.0
+        self.animation_speed   = 10           # frames per second
         self.image             = self.current_animation[0]
 
-        # --- Position / collision rect ---
+       
         self.rect = self.image.get_rect(topleft=(x, y))
 
-        # Separate float position so sub-pixel movement accumulates correctly
+        # Float position for smooth sub-pixel movement
         self.pos_x = float(x)
         self.pos_y = float(y)
 
-    # ------------------------------------------------------------------
+    
     def update(self, dt, world):
         keys   = pygame.key.get_pressed()
         moving = False
 
-        # Pick direction — vertical keys take priority if both axes pressed
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
+        
+        if keys[pygame.K_i]:
             self.pos_y -= PLAYER_SPEED * dt
             self._set_anim(self.walk_up)
             moving = True
 
-        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+        elif keys[pygame.K_k]:
             self.pos_y += PLAYER_SPEED * dt
             self._set_anim(self.walk_down)
             moving = True
 
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+        if keys[pygame.K_j]:
             self.pos_x -= PLAYER_SPEED * dt
-            if not moving:                    # only switch row anim if not already moving vertically
+            if not moving:
                 self._set_anim(self.walk_left)
             moving = True
 
-        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_l]:
             self.pos_x += PLAYER_SPEED * dt
             if not moving:
                 self._set_anim(self.walk_right)
             moving = True
 
-        # Sync rect to float position
+        
         self.rect.topleft = (int(self.pos_x), int(self.pos_y))
 
-        # --- Animate ---
+        
         if moving:
             self.frame_index += self.animation_speed * dt
             if self.frame_index >= len(self.current_animation):
                 self.frame_index = 0.0
             self.image = self.current_animation[int(self.frame_index)]
         else:
-            # Idle: freeze on frame 0 of whichever direction we're facing
+            
             self.frame_index = 0.0
             self.image = self.current_animation[0]
 
-    # ------------------------------------------------------------------
+    
     def _set_anim(self, anim):
         """Switch animation row without resetting frame if already playing it."""
         if anim is not self.current_animation:
             self.current_animation = anim
             self.frame_index = 0.0
 
-    # ------------------------------------------------------------------
+    
     def draw(self, screen):
         screen.blit(self.image, self.rect)
