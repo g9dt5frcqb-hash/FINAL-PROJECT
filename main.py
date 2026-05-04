@@ -1,6 +1,7 @@
 import pygame
 from engine.settings import *
 from engine.player import Player
+from engine.Ferb import Ferb
 from engine.world import World
 
 pygame.init()
@@ -12,11 +13,12 @@ clock = pygame.time.Clock()
 
 # Create game objects
 player = Player(300, 200)
+ferb = Ferb(400, 200)  # spawn Ferb a bit to the right of Phineas
 world = World()
 
 running = True
 while running:
-    dt = clock.tick(60) / 1000 
+    dt = clock.tick(60) / 1000
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -24,11 +26,12 @@ while running:
 
     # Update
     player.update(dt, world)
+    ferb.update(dt, world)
 
     # Draw
-    screen.fill((135, 206, 235)) 
     world.draw(screen)
     player.draw(screen)
+    ferb.draw(screen)
 
     pygame.display.flip()
 
