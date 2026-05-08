@@ -11,9 +11,9 @@ pygame.display.set_caption("Phineas & Ferb: Open World")
 
 clock = pygame.time.Clock()
 
-# Create game objects
+
 player = Player(300, 200)
-ferb = Ferb(400, 200)  # spawn Ferb a bit to the right of Phineas
+ferb = Ferb(400, 200) 
 world = World()
 
 running = True
